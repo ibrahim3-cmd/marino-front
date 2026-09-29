@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { SearchModal } from "@/components/search/search-modal"
 import { cn } from "@/lib/utils"
-import { shopLinks, mobileMenuSections } from "@/lib/navigation"
+import { shopLinks, accountLinks, infoLinks } from "@/lib/navigation"
 import { siteConfig } from "@/lib/config"
 import { useTranslations } from "next-intl"
 import { useState, useEffect } from "react"
@@ -38,9 +38,11 @@ export function Header({ categories = [] }: HeaderProps) {
   const navCategories = visibleCategories.length > 0
     ? visibleCategories.slice(0, 6).map((cat) => ({ name: cat.name, href: `/${cat.slug}` }))
     : shopLinks
-  const mobileSections = visibleCategories.length > 0
-    ? [{ label: "Shop", items: navCategories }]
-    : mobileMenuSections
+  const mobileSections = [
+    { label: "Shop", items: navCategories },
+    { label: "Account", items: accountLinks },
+    { label: "Info", items: infoLinks },
+  ]
   const t = useTranslations("nav")
 
   useEffect(() => {
@@ -216,10 +218,18 @@ export function Header({ categories = [] }: HeaderProps) {
 
           <Link
             href="/wishlist"
-            className="hidden h-10 w-10 items-center justify-center rounded-md hover:bg-accent lg:inline-flex"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-accent"
             aria-label={t("wishlist")}
           >
             <Heart className="h-5 w-5" />
+          </Link>
+
+          <Link
+            href={isAuthenticated ? "/account" : "/auth/login"}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md hover:bg-accent lg:hidden"
+            aria-label={isAuthenticated ? "Profile" : tCommon("signIn")}
+          >
+            <User className="h-5 w-5" />
           </Link>
 
           {/* User menu — desktop only */}
