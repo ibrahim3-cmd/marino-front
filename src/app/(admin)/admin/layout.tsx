@@ -43,12 +43,12 @@ export default function AdminLayout({
   }
 
   const navLinks = (
-    <nav className="space-y-1 p-4">
+    <nav className="space-y-1.5 p-3 sm:p-4">
       {adminNav.map((item) => (
         <Link
           key={item.name}
           href={item.href}
-          className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-white hover:text-foreground"
+          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
           onClick={() => setMobileMenuOpen(false)}
         >
           <item.icon className="h-4 w-4" />
@@ -59,24 +59,24 @@ export default function AdminLayout({
   )
 
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row">
-      <header className="flex items-center justify-between border-b bg-white px-4 py-3 lg:hidden">
-        <Link href="/admin" className="text-lg font-semibold">
+    <div className="flex min-h-screen flex-col bg-muted/20 lg:flex-row">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b bg-background/95 px-4 py-3 backdrop-blur-sm lg:hidden">
+        <Link href="/admin" className="text-lg font-semibold tracking-tight">
           Admin
         </Link>
 
         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <SheetTrigger className="inline-flex h-10 w-10 items-center justify-center rounded-md border hover:bg-accent" aria-label="Open admin menu">
+          <SheetTrigger className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-border bg-background text-foreground shadow-sm transition hover:bg-accent" aria-label="Open admin menu">
             <Menu className="h-5 w-5" />
           </SheetTrigger>
-          <SheetContent side="left" className="w-[85vw] max-w-sm p-0" showCloseButton={false}>
+          <SheetContent side="left" className="w-[85vw] max-w-sm border-r bg-background p-0" showCloseButton={false}>
             <div className="flex h-16 items-center justify-between border-b px-4">
-              <Link href="/admin" className="text-lg font-semibold" onClick={() => setMobileMenuOpen(false)}>
+              <Link href="/admin" className="text-lg font-semibold tracking-tight" onClick={() => setMobileMenuOpen(false)}>
                 Admin
               </Link>
               <button
                 type="button"
-                className="text-sm text-muted-foreground hover:text-foreground"
+                className="rounded-md px-2 py-1 text-sm text-muted-foreground transition hover:bg-accent hover:text-foreground"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Close
@@ -86,7 +86,7 @@ export default function AdminLayout({
             <div className="border-t p-4">
               <Link
                 href="/"
-                className="text-sm text-muted-foreground hover:text-foreground"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground transition hover:text-foreground"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 &larr; Back to Store
@@ -97,9 +97,9 @@ export default function AdminLayout({
       </header>
 
       {/* Sidebar */}
-      <aside className="hidden w-64 border-r bg-neutral-50 lg:flex lg:flex-col">
+      <aside className="hidden w-64 border-r border-border bg-background lg:flex lg:flex-col">
         <div className="flex h-16 items-center border-b px-6">
-          <Link href="/admin" className="text-lg font-semibold">
+          <Link href="/admin" className="text-lg font-semibold tracking-tight">
             Admin
           </Link>
         </div>
@@ -107,7 +107,7 @@ export default function AdminLayout({
         <div className="mt-auto border-t p-4">
           <Link
             href="/"
-            className="text-sm text-muted-foreground hover:text-foreground"
+            className="text-sm text-muted-foreground transition hover:text-foreground"
           >
             &larr; Back to Store
           </Link>
@@ -115,7 +115,7 @@ export default function AdminLayout({
       </aside>
 
       {/* Main */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+      <main className="flex-1 px-3 py-4 sm:px-6 sm:py-6 lg:px-8 lg:py-8">{children}</main>
     </div>
   )
 }

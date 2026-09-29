@@ -121,3 +121,25 @@ export async function fetchBackendOrderById(id: string) {
 
   return mapOrderFromBackend(await response.json())
 }
+
+export async function updateBackendOrderStatus(
+  id: string,
+  status: OrderStatus,
+  token?: string | null,
+) {
+  const response = await fetch(`${backendBaseUrl}/api/orders/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ status }),
+  })
+
+  if (!response.ok) {
+    throw new Error("Unable to update order status")
+  }
+
+  return mapOrderFromBackend(await response.json())
+}

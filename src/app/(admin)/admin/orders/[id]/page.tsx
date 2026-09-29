@@ -6,14 +6,28 @@ import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { OrderStatusBadge } from "@/components/ui/order-status-badge"
-import { fetchBackendOrderById } from "@/lib/backend-orders"
+import { fetchBackendOrderById, updateBackendOrderStatus } from "@/lib/backend-orders"
 import { formatDate, formatPrice } from "@/lib/utils"
-import type { Order } from "@/types"
+import { useAuthStore } from "@/store/auth"
+import type { Order, OrderStatus } from "@/types"
+
+const ORDER_STATUS_OPTIONS: OrderStatus[] = [
+  "pending",
+  "processing",
+  "shipped",
+  "delivered",
+  "cancelled",
+  "refunded",
+]
 
 export default function AdminOrderDetailPage() {
   const params = useParams()
+  const token = useAuthStore((state) => state.token)
   const [order, setOrder] = useState<Order | null>(null)
+  const [statusDraft, setStatusDraft] = useState<OrderStatus>("pending")
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState("")
 
   useEffect(() => {
     const id = String(params?.id || "")
@@ -23,10 +37,31 @@ export default function AdminOrderDetailPage() {
     }
 
     fetchBackendOrderById(id)
-      .then((data) => setOrder(data))
+      .then((data) => {
+        setOrder(data)
+        setStatusDraft(data.status)
+      })
       .catch(() => setOrder(null))
       .finally(() => setLoading(false))
   }, [params])
+
+  const handleStatusUpdate = async () => {
+    if (!order || statusDraft === order.status) return
+
+    setSaving(true)
+    setSaveError("")
+
+    try {
+      const updated = await updateBackendOrderStatus(order.id, statusDraft, token)
+      setOrder(updated)
+      setStatusDraft(updated.status)
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : "Unable to update status.")
+      setStatusDraft(order.status)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   if (loading) {
     return <div className="p-6 text-sm text-muted-foreground">Loading order…</div>
@@ -57,6 +92,37 @@ export default function AdminOrderDetailPage() {
           </Link>
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Order status</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <select
+              value={statusDraft}
+              onChange={(event) => setStatusDraft(event.target.value as OrderStatus)}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring sm:max-w-xs"
+            >
+              {ORDER_STATUS_OPTIONS.map((status) => (
+                <option key={status} value={status}>
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </option>
+              ))}
+            </select>
+
+            <Button
+              type="button"
+              onClick={handleStatusUpdate}
+              disabled={saving || statusDraft === order.status}
+            >
+              {saving ? "Saving..." : "Update status"}
+            </Button>
+          </div>
+
+          {saveError ? <p className="text-sm text-destructive">{saveError}</p> : null}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
