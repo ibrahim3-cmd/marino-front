@@ -10,7 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping frontend
-        run: curl -f https://marino-front.onrender.com || exit 1
+        run: |
+          curl --fail --retry 3 --retry-delay 10 --max-time 30 https://marino-front.onrender.com || exit 1
 
       - name: Ping backend
-        run: curl -f https://marino-back.onrender.com/api/health || exit 1
+        run: |
+          curl --fail --retry 3 --retry-delay 10 --max-time 30 https://marino-back.onrender.com/api/health || exit 1
